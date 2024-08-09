@@ -1,10 +1,25 @@
 package data
 
 import (
-	"time"
+	"context"
+	"errors"
+	"fmt"
 
-	"github.com/amha-mersha/go_taskmanager/models"
+	"github.com/amha-mersha/go_taskmanager_mongo/models"
+	"github.com/amha-mersha/go_taskmanager_mongo/route"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+func int64ToObjID(ID int64) (primitive.ObjectID, error) {
+	hexaString := fmt.Sprintf("%x", ID)
+	if len(hexaString) < 24 {
+		hexaString = fmt.Sprintf("%024s", hexaString)
+	}
+	return primitive.ObjectIDFromHex(hexaString)
+}
 
 type TaskError struct {
 	message string
@@ -15,87 +30,80 @@ func (err TaskError) Error() string {
 }
 
 const (
-	IDNotFound        = "No item found with the specified ID."
-	TaskAlreadyExists = "The task already exists in the database"
-	MalformedJSON     = "Sent a malfomed JSON."
-	MismatchedFormat  = "The task have a mismatched stucture."
-	MissingRequireds  = "There are some missing required feilds."
+	IDNotFound        = "no item found with the specified id"
+	TaskAlreadyExists = "the task already exists in the database"
+	MalformedJSON     = "sent a malfomed json"
+	MismatchedFormat  = "the task have a mismatched stucture"
+	MissingRequireds  = "there are some missing required feilds"
+	MalformedID       = "the id sent is malformed"
 )
 
-var tasks = map[int64]models.Task{
-	0: {
-		ID:          0,
-		Title:       "Prepare presentation",
-		Description: "Prepare slides for the upcoming presentation",
-		Status:      "pending",
-		Priority:    "",
-		DueDate:     time.Time{},
-		CreatedAt:   time.Time{},
-		UpdatedAt:   time.Time{},
-	},
-	1: {
-		ID:          1,
-		Title:       "Write unit tests",
-		Description: "Write unit tests for the new features implemented",
-		Status:      "pending",
-		Priority:    "",
-		DueDate:     time.Time{},
-		CreatedAt:   time.Time{},
-		UpdatedAt:   time.Time{},
-	},
-	2: {
-		ID:          2,
-		Title:       "Complete project report",
-		Description: "Finish the annual project report by the end of the week",
-		Status:      "completed",
-		Priority:    "high",
-		DueDate:     time.Time{},
-		CreatedAt:   time.Time{},
-		UpdatedAt:   time.Time{},
-	},
-	3: {
-		ID:          3,
-		Title:       "Team meeting",
-		Description: "Attend the weekly team meeting on Friday",
-		Status:      "completed",
-		Priority:    "",
-		DueDate:     time.Time{},
-		CreatedAt:   time.Time{},
-		UpdatedAt:   time.Time{},
-	},
-}
-
-func GetTasks() map[int64]models.Task {
-	return tasks
+func GetTasks() ([]models.Task, error) {
+	var result []models.Task
+	curr, err := route.Collection.Find(context.TODO(), bson.D{{}}, options.Find())
+	if err != nil {
+		return []models.Task{}, err
+	}
+	err = curr.All(context.TODO(), &result)
+	if err != nil {
+		return []models.Task{}, err
+	}
+	return result, nil
 }
 
 func GetTaskByID(taskID int64) (models.Task, error) {
-	if _, exist := tasks[taskID]; !exist {
-		return models.Task{}, TaskError{message: IDNotFound}
+	var result models.Task
+	ID, err := int64ToObjID(taskID)
+	if err != nil {
+		return models.Task{}, fmt.Errorf(MalformedID)
 	}
-	return tasks[taskID], nil
+	err = route.Collection.FindOne(context.TODO(), bson.D{{"_id", ID}}).Decode(&result)
+	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
+		return models.Task{}, fmt.Errorf(IDNotFound)
+	} else if err != nil {
+		return models.Task{}, err
+	}
+	return result, nil
 }
 
-func UpdateTask(taskID int64, updatedTask models.Task) error {
-	if _, exist := tasks[taskID]; !exist {
-		return TaskError{message: IDNotFound}
+func UpdateTask(taskID int64, updatedTask models.Task) (models.Task, error) {
+	var result models.Task
+	ID, err := int64ToObjID(taskID)
+	if err != nil {
+		return models.Task{}, fmt.Errorf(MalformedID)
 	}
-	tasks[taskID] = updatedTask
-	return nil
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+	filter := bson.D{{"_id", ID}}
+
+	err = route.Collection.FindOneAndUpdate(context.TODO(), filter, updatedTask, opts).Decode(&result)
+	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
+		return models.Task{}, fmt.Errorf(IDNotFound)
+	} else if err != nil {
+		return models.Task{}, err
+	}
+	return result, nil
 }
 
-func DeleteTask(taskID int64) error {
-	if _, exist := tasks[taskID]; !exist {
-		return TaskError{message: IDNotFound}
+func DeleteTask(taskID int64) (models.Task, error) {
+	var result models.Task
+	ID, err := int64ToObjID(taskID)
+	if err != nil {
+		return models.Task{}, fmt.Errorf(MalformedID)
 	}
-	delete(tasks, taskID)
-	return nil
+	filter := bson.D{{"_id", ID}}
+	err = route.Collection.FindOneAndDelete(context.TODO(), filter).Decode(&result)
+	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
+		return models.Task{}, fmt.Errorf(IDNotFound)
+	} else if err != nil {
+		return models.Task{}, err
+	}
+	return result, nil
 }
 
-func PostTask(newTask models.Task) error {
-	if _, exist := tasks[int64(newTask.ID)]; exist {
-		return TaskError{message: TaskAlreadyExists}
+func PostTask(newTask models.Task) (*mongo.InsertOneResult, error) {
+	result, err := route.Collection.InsertOne(context.TODO(), newTask)
+	if err != nil {
+		return &mongo.InsertOneResult{}, fmt.Errorf(MalformedID)
 	}
-	tasks[int64(newTask.ID)] = newTask
-	return nil
+	return result, err
 }

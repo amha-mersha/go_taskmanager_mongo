@@ -5,14 +5,19 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/amha-mersha/go_taskmanager/data"
-	"github.com/amha-mersha/go_taskmanager/models"
+	"github.com/amha-mersha/go_taskmanager_mongo/data"
+	"github.com/amha-mersha/go_taskmanager_mongo/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 func GetTasks(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, data.GetTasks())
+	tasks, err := data.GetTasks()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, tasks)
 }
 
 func GetTaskByID(ctx *gin.Context) {
@@ -51,12 +56,12 @@ func UpdateTask(ctx *gin.Context) {
 		}
 		return
 	}
-	err = data.UpdateTask(taskID, updatedTask)
+	returnedTask, err := data.UpdateTask(taskID, updatedTask)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, updatedTask)
+	ctx.JSON(http.StatusOK, returnedTask)
 }
 
 func DeleteTask(ctx *gin.Context) {
@@ -65,12 +70,12 @@ func DeleteTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
-	err = data.DeleteTask(taskID)
+	deletedTask, err := data.DeleteTask(taskID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"Success": "Task has been succesfuly deleted."})
+	ctx.JSON(http.StatusOK, deletedTask)
 }
 
 func PostTask(ctx *gin.Context) {
@@ -90,11 +95,11 @@ func PostTask(ctx *gin.Context) {
 		}
 		return
 	}
-	err := data.PostTask(newTask)
+	result, err := data.PostTask(newTask)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusAccepted, newTask)
+	ctx.JSON(http.StatusAccepted, result)
 }
