@@ -8,6 +8,7 @@ import (
 	"github.com/amha-mersha/go_taskmanager_mongo/data"
 	"github.com/amha-mersha/go_taskmanager_mongo/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator"
 	"github.com/go-playground/validator/v10"
 )
 
