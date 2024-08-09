@@ -159,7 +159,7 @@ Welcome to the Task Manager API documentation. This API allows users to manage t
 
 ### Task Model
 
-````go
+```go
 type Task struct {
     Title       string    `json:"title"`
     Description string    `json:"description"`
@@ -169,12 +169,20 @@ type Task struct {
     CreatedAt   time.Time `json:"created_at"`
     UpdatedAt   time.Time `json:"updated_at"`
 }
+```
+
 ### Title: The title of the task.
+
 #### Description: A brief description of the task.
+
 #### Status: The current status of the task (e.g., Pending, In Progress, Completed).
+
 #### Priority: The priority level of the task (e.g., Low, Medium, High).
+
 #### DueDate: The due date for the task.
+
 #### CreatedAt: The timestamp when the task was created.
+
 #### UpdatedAt: The timestamp when the task was last updated.
 
 ## Database
@@ -183,22 +191,29 @@ type Task struct {
 - Connection is handled in the data/db_connection.go file.
 
 ## Environment Variables
+
 - GODOTENV is used for managing environment variables.
 - Typical .env file includes:
-``` bash
+
+```bash
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/taskmanager?retryWrites=true&w=majority
 PORT=8080
 ```
 
 ## Running the Application
+
 - Clone the repository.
 - Create a .env file in the root directory with the necessary environment variables.
 - Run the application:
- ``` bash
+
+```bash
 go run main.go
 ```
+
 - The server will be up and running on http://localhost:<port>.
+
 ## Conclusion
+
 This API allows users to manage tasks by providing endpoints for creating, reading, updating, and deleting tasks. The app is built using Go, Gin, and MongoDB, providing a scalable solution for task management.
 
 ### Notes:
@@ -208,4 +223,3 @@ This API allows users to manage tasks by providing endpoints for creating, readi
 - **Database** and **Environment Variables** sections provide necessary configuration details.
 
 This documentation gives a clear overview of how to use the API and what to expect from each endpoint.
-````
