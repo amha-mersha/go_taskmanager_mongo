@@ -173,17 +173,17 @@ type Task struct {
 
 ### Title: The title of the task.
 
-#### Description: A brief description of the task.
+Description: A brief description of the task.
 
-#### Status: The current status of the task (e.g., Pending, In Progress, Completed).
+Status: The current status of the task (e.g., Pending, In Progress, Completed).
 
-#### Priority: The priority level of the task (e.g., Low, Medium, High).
+Priority: The priority level of the task (e.g., Low, Medium, High).
 
-#### DueDate: The due date for the task.
+DueDate: The due date for the task.
 
-#### CreatedAt: The timestamp when the task was created.
+CreatedAt: The timestamp when the task was created.
 
-#### UpdatedAt: The timestamp when the task was last updated.
+UpdatedAt: The timestamp when the task was last updated.
 
 ## Database
 
