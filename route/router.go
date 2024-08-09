@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/amha-mersha/go_taskmanager_mongo/controllers"
+	"github.com/amha-mersha/go_taskmanager_mongo/data"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +19,7 @@ func Run(port int) {
 	router.PUT("/api/v1/tasks/:id", controllers.UpdateTask)
 	router.DELETE("/api/v1/tasks/:id", controllers.DeleteTask)
 
-	err := ConnecDB()
+	err := data.ConnecDB()
 	if err != nil {
 		fmt.Println("Error occured when connecting to database.")
 		return

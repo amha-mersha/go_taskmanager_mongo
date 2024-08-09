@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/amha-mersha/go_taskmanager_mongo/models"
-	"github.com/amha-mersha/go_taskmanager_mongo/route"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -40,7 +39,7 @@ const (
 
 func GetTasks() ([]models.Task, error) {
 	var result []models.Task
-	curr, err := route.Collection.Find(context.TODO(), bson.D{{}}, options.Find())
+	curr, err := Collection.Find(context.TODO(), bson.D{{}}, options.Find())
 	if err != nil {
 		return []models.Task{}, err
 	}
@@ -57,7 +56,7 @@ func GetTaskByID(taskID int64) (models.Task, error) {
 	if err != nil {
 		return models.Task{}, fmt.Errorf(MalformedID)
 	}
-	err = route.Collection.FindOne(context.TODO(), bson.D{{"_id", ID}}).Decode(&result)
+	err = Collection.FindOne(context.TODO(), bson.D{{"_id", ID}}).Decode(&result)
 	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
 		return models.Task{}, fmt.Errorf(IDNotFound)
 	} else if err != nil {
@@ -75,7 +74,7 @@ func UpdateTask(taskID int64, updatedTask models.Task) (models.Task, error) {
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	filter := bson.D{{"_id", ID}}
 
-	err = route.Collection.FindOneAndUpdate(context.TODO(), filter, updatedTask, opts).Decode(&result)
+	err = Collection.FindOneAndUpdate(context.TODO(), filter, updatedTask, opts).Decode(&result)
 	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
 		return models.Task{}, fmt.Errorf(IDNotFound)
 	} else if err != nil {
@@ -91,7 +90,7 @@ func DeleteTask(taskID int64) (models.Task, error) {
 		return models.Task{}, fmt.Errorf(MalformedID)
 	}
 	filter := bson.D{{"_id", ID}}
-	err = route.Collection.FindOneAndDelete(context.TODO(), filter).Decode(&result)
+	err = Collection.FindOneAndDelete(context.TODO(), filter).Decode(&result)
 	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
 		return models.Task{}, fmt.Errorf(IDNotFound)
 	} else if err != nil {
@@ -101,7 +100,7 @@ func DeleteTask(taskID int64) (models.Task, error) {
 }
 
 func PostTask(newTask models.Task) (*mongo.InsertOneResult, error) {
-	result, err := route.Collection.InsertOne(context.TODO(), newTask)
+	result, err := Collection.InsertOne(context.TODO(), newTask)
 	if err != nil {
 		return &mongo.InsertOneResult{}, fmt.Errorf(MalformedID)
 	}
