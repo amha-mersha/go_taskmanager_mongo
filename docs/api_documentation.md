@@ -1,277 +1,211 @@
 # Task-Manager
 
-Welcome to the Task Manager API documentation. This API allows users to manage tasks efficiently by providing endpoints to create, read, update, and delete tasks. The API is designed to handle task-related operations such as setting task priorities, tracking due dates, and updating task statuses. Built with Go and utilizing the Gin framework, the Task Manager API ensures high performance and scalability for your task management needs.
+Welcome to the Task Manager API documentation. This API allows users to manage tasks efficiently by providing endpoints to create, read, update, and delete tasks. The API is designed to handle task-related operations such as setting task priorities, tracking due dates, and updating task statuses. The API is built using Go with the Gin web framework and MongoDB as the database. The following endpoints are available to interact with tasks.
 
-##Get All Tasks
-`{{URL}}api/v1/tasks`
+## Base URL
 
-## API Request Description
+`http://localhost:<port>/api/v1`
 
-This API endpoint makes an HTTP GET request to retrieve a list of tasks.
+## Endpoints
 
-### Request Parameters
+### 1. Get All Tasks
 
-- No request parameters are required for this endpoint.
+- **Endpoint:** `/tasks`
+- **Method:** `GET`
+- **Description:** Retrieves a list of all tasks.
+- **Response:**
+  - **Status Code:** `200 OK`
+  - **Body:**
+    ```json
+    [
+      {
+        "title": "Task 1",
+        "description": "Description for Task 1",
+        "status": "Pending",
+        "priority": "High",
+        "due_date": "2024-08-10T00:00:00Z",
+        "created_at": "2024-08-01T00:00:00Z",
+        "updated_at": "2024-08-01T00:00:00Z"
+      },
+      {
+        "title": "Task 2",
+        "description": "Description for Task 2",
+        "status": "Completed",
+        "priority": "Medium",
+        "due_date": "2024-08-15T00:00:00Z",
+        "created_at": "2024-08-02T00:00:00Z",
+        "updated_at": "2024-08-05T00:00:00Z"
+      }
+    ]
+    ```
 
-### Query Parameters
+### 2. Get Task by ID
 
-- No query parameters are required for this endpoint.
-
-### Authentication
-
-- The user needs to be authenticated to access this endpoint.
-
-## API Response
-
-The API returns a JSON object containing a list of tasks. Each task is represented by an object with the following properties:
-
-- `id` (number): The unique identifier of the task.
-- `title` (string): The title of the task.
-- `description` (string): The description of the task.
-- `status` (string): The status of the task.
-- `priority` (string): The priority of the task.
-- `due_date` (string): The due date of the task.
-- `created_at` (string): The timestamp when the task was created.
-- `updated_at` (string): The timestamp when the task was last updated.
-
-### Response Example
-
-```json
-{
-  "2": {
-    "id": 0,
-    "title": "",
-    "description": "",
-    "status": "",
-    "priority": "",
-    "due_date": "",
-    "created_at": "",
-    "updated_at": ""
-  },
-  "3": {
-    "id": 0,
-    "title": "",
-    "description": "",
-    "status": "",
-    "priority": "",
-    "due_date": "",
-    "created_at": "",
-    "updated_at": ""
-  }
-}
-```
-
-## Create Task
-
-`{{URL}}api/v1/tasks/`
-
-### Create Task
-
-This endpoint allows the user to create a new task.
-
-#### Request Body
-
-- `id` (number, required): The unique identifier for the task.
-- `title` (string, required): The title of the task.
-- `description` (string, required): A brief description of the task.
-- `status` (string, required): The status of the task (e.g., completed, pending, in progress).
-- `priority` (string, required): The priority level of the task (e.g., high, medium, low).
-- `due_date` (string, required): The due date for the task in the format "YYYY-MM-DDTHH:MM:SSZ".
-- `created_at` (string, required): The date and time when the task was created in the format "YYYY-MM-DDTHH:MM:SSZ".
-- `updated_at` (string, required): The date and time when the task was last updated in the format "YYYY-MM-DDTHH:MM:SSZ".
-
-#### Response (JSON Schema)
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "id": { "type": "number" },
-    "title": { "type": "string" },
-    "description": { "type": "string" },
-    "status": { "type": "string" },
-    "priority": { "type": "string" },
-    "due_date": { "type": "string" },
-    "created_at": { "type": "string" },
-    "updated_at": { "type": "string" }
-  }
-}
-```
-
-### Body (raw json)
-
-```json
-{
-  "id": 432,
-  "title": "Complete project report",
-  "description": "Finish the annual project report by the end of the week",
-  "status": "completed",
-  "priority": "high",
-  "due_date": "0001-01-01T00:00:00Z",
-  "created_at": "0001-01-01T00:00:00Z",
-  "updated_at": "0001-01-01T00:00:00Z"
-}
-```
-
-##Get Single Task
-`{{URL}}api/v1/tasks/:id`
-
-### Request
-
-- Method: GET
-- Endpoint: {{URL}}api/v1/tasks/:id
-
-### Response
-
-- Status: 200 OK
-- Content-Type: application/json
-- Body:
-  ```json
-  {
-    "id": 0,
-    "title": "",
-    "description": "",
-    "status": "",
-    "priority": "",
-    "due_date": "",
-    "created_at": "",
-    "updated_at": ""
-  }
-  ```
-
-This endpoint returns the details of a task identified by the provided ID, including its title, description, status, priority, due date, creation timestamp, and last update timestamp.
-
-#### JSON Schema
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "number"
-    },
-    "title": {
-      "type": "string"
-    },
-    "description": {
-      "type": "string"
-    },
-    "status": {
-      "type": "string"
-    },
-    "priority": {
-      "type": "string"
-    },
-    "due_date": {
-      "type": "string"
-    },
-    "created_at": {
-      "type": "string"
-    },
-    "updated_at": {
-      "type": "string"
+- **Endpoint:** `/tasks/:id`
+- **Method:** `GET`
+- **Description:** Retrieves a single task by its ID.
+- **Parameters:**
+  - **Path Parameter:** `id` (string) - The unique identifier of the task.
+- **Response:**
+  - **Status Code:** `200 OK`
+  - **Body:**
+    ```json
+    {
+      "title": "Task 1",
+      "description": "Description for Task 1",
+      "status": "Pending",
+      "priority": "High",
+      "due_date": "2024-08-10T00:00:00Z",
+      "created_at": "2024-08-01T00:00:00Z",
+      "updated_at": "2024-08-01T00:00:00Z"
     }
-  }
+    ```
+  - **Error Response:**
+    - **Status Code:** `404 Not Found`
+    - **Body:**
+      ```json
+      {
+        "error": "Task not found"
+      }
+      ```
+
+### 3. Create a New Task
+
+- **Endpoint:** `/tasks`
+- **Method:** `POST`
+- **Description:** Creates a new task.
+- **Request Body:**
+  - **Content-Type:** `application/json`
+  - **Body:**
+    ```json
+    {
+      "title": "New Task",
+      "description": "Description for new task",
+      "status": "Pending",
+      "priority": "Low",
+      "due_date": "2024-08-20T00:00:00Z"
+    }
+    ```
+- **Response:**
+  - **Status Code:** `201 Created`
+  - **Body:**
+    ```json
+    {
+      "message": "Task created successfully"
+    }
+    ```
+
+### 4. Update an Existing Task
+
+- **Endpoint:** `/tasks/:id`
+- **Method:** `PUT`
+- **Description:** Updates an existing task by its ID.
+- **Parameters:**
+  - **Path Parameter:** `id` (string) - The unique identifier of the task.
+- **Request Body:**
+  - **Content-Type:** `application/json`
+  - **Body:**
+    ```json
+    {
+      "title": "Updated Task",
+      "description": "Updated description for task",
+      "status": "In Progress",
+      "priority": "Medium",
+      "due_date": "2024-08-18T00:00:00Z"
+    }
+    ```
+- **Response:**
+  - **Status Code:** `200 OK`
+  - **Body:**
+    ```json
+    {
+      "message": "Task updated successfully"
+    }
+    ```
+  - **Error Response:**
+    - **Status Code:** `404 Not Found`
+    - **Body:**
+      ```json
+      {
+        "error": "Task not found"
+      }
+      ```
+
+### 5. Delete a Task
+
+- **Endpoint:** `/tasks/:id`
+- **Method:** `DELETE`
+- **Description:** Deletes a task by its ID.
+- **Parameters:**
+  - **Path Parameter:** `id` (string) - The unique identifier of the task.
+- **Response:**
+  - **Status Code:** `200 OK`
+  - **Body:**
+    ```json
+    {
+      "message": "Task deleted successfully"
+    }
+    ```
+  - **Error Response:**
+    - **Status Code:** `404 Not Found`
+    - **Body:**
+      ```json
+      {
+        "error": "Task not found"
+      }
+      ```
+
+## Models
+
+### Task Model
+
+````go
+type Task struct {
+    Title       string    `json:"title"`
+    Description string    `json:"description"`
+    Status      string    `json:"status"`
+    Priority    string    `json:"priority"`
+    DueDate     time.Time `json:"due_date"`
+    CreatedAt   time.Time `json:"created_at"`
+    UpdatedAt   time.Time `json:"updated_at"`
 }
+### Title: The title of the task.
+#### Description: A brief description of the task.
+#### Status: The current status of the task (e.g., Pending, In Progress, Completed).
+#### Priority: The priority level of the task (e.g., Low, Medium, High).
+#### DueDate: The due date for the task.
+#### CreatedAt: The timestamp when the task was created.
+#### UpdatedAt: The timestamp when the task was last updated.
+
+## Database
+
+- MongoDB is used to store the tasks.
+- Connection is handled in the data/db_connection.go file.
+
+## Environment Variables
+- GODOTENV is used for managing environment variables.
+- Typical .env file includes:
+``` bash
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/taskmanager?retryWrites=true&w=majority
+PORT=8080
 ```
 
-### Path Variables
-
-`id              {{randomTen}}`
-
-## Update Single Task
-
-`{{URL}}api/v1/tasks/:id`
-
-### Update Task
-
-This endpoint is used to update a specific task by its ID.
-
-#### Request
-
-- Method: PUT
-- URL: `{{URL}}api/v1/tasks/:id`
-- Body (raw, application/json):
-  ```json
-  {
-    "id": 0,
-    "title": "",
-    "description": "",
-    "status": "",
-    "priority": "",
-    "due_date": "",
-    "created_at": "",
-    "updated_at": ""
-  }
-  ```
-
-#### Response
-
-The response is a JSON object with the following schema:
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "id": { "type": "number" },
-    "title": { "type": "string" },
-    "description": { "type": "string" },
-    "status": { "type": "string" },
-    "priority": { "type": "string" },
-    "due_date": { "type": "string" },
-    "created_at": { "type": "string" },
-    "updated_at": { "type": "string" }
-  }
-}
+## Running the Application
+- Clone the repository.
+- Create a .env file in the root directory with the necessary environment variables.
+- Run the application:
+ ``` bash
+go run main.go
 ```
+- The server will be up and running on http://localhost:<port>.
+## Conclusion
+This API allows users to manage tasks by providing endpoints for creating, reading, updating, and deleting tasks. The app is built using Go, Gin, and MongoDB, providing a scalable solution for task management.
 
-### Path Variables
+### Notes:
 
-`id                 {{randomTen}}`
+- **Endpoints** are documented with their respective HTTP methods and expected request/response formats.
+- **Models** section details the structure of the Task model.
+- **Database** and **Environment Variables** sections provide necessary configuration details.
 
-### Body
-
-##### raw (json)
-
-```json
-{
-  "id": 2,
-  "title": "Write unit tests",
-  "description": "Write unit tests for the new features implemented",
-  "status": "pending",
-  "priority": "",
-  "due_date": "0001-01-01T00:00:00Z",
-  "created_at": "0001-01-01T00:00:00Z",
-  "updated_at": "0001-01-01T00:00:00Z"
-}
-```
-
-## Delete Single Task
-
-`{{URL}}api/v1/tasks/:id`
-
-### Delete Task
-
-This endpoint is used to delete a specific task by providing the task ID in the URL.
-
-#### Request
-
-- Method: DELETE
-- Headers: No specific headers required
-- URL: {{URL}}api/v1/tasks/:id
-
-#### Response
-
-- Status: 200
-- Content-Type: application/json
-- Body:
-
-  ```json
-  {
-    "Success": ""
-  }
-  ```
-
-### Path Variables
-
-`id                 {{randomTen}}`
+This documentation gives a clear overview of how to use the API and what to expect from each endpoint.
+````
