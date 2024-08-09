@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/amha-mersha/go_taskmanager_mongo/data"
 	"github.com/amha-mersha/go_taskmanager_mongo/models"
@@ -21,11 +20,7 @@ func GetTasks(ctx *gin.Context) {
 }
 
 func GetTaskByID(ctx *gin.Context) {
-	taskID, err := strconv.ParseInt(ctx.Param("id"), 10, 0)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
-		return
-	}
+	taskID := ctx.Param("id")
 	task, err := data.GetTaskByID(taskID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
@@ -35,13 +30,9 @@ func GetTaskByID(ctx *gin.Context) {
 }
 
 func UpdateTask(ctx *gin.Context) {
-	taskID, err := strconv.ParseInt(ctx.Param("id"), 10, 0)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
-		return
-	}
+	taskID := ctx.Param("id")
 	var updatedTask models.Task
-	if err = ctx.ShouldBindJSON(&updatedTask); err != nil {
+	if err := ctx.ShouldBindJSON(&updatedTask); err != nil {
 		switch e := err.(type) {
 		case *json.SyntaxError:
 			ctx.JSON(http.StatusBadRequest, gin.H{"Error": data.MalformedJSON})
@@ -65,11 +56,7 @@ func UpdateTask(ctx *gin.Context) {
 }
 
 func DeleteTask(ctx *gin.Context) {
-	taskID, err := strconv.ParseInt(ctx.Param("id"), 10, 0)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
-		return
-	}
+	taskID := ctx.Param("id")
 	deletedTask, err := data.DeleteTask(taskID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})

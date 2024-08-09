@@ -21,7 +21,7 @@ func Run(port int) {
 
 	err := data.ConnecDB()
 	if err != nil {
-		fmt.Println("Error occured when connecting to database.")
+		fmt.Printf("Error occured when connecting to database. %v \n", err)
 		return
 	}
 	router.Run("localhost:" + strconv.Itoa(port))

@@ -12,14 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func int64ToObjID(ID int64) (primitive.ObjectID, error) {
-	hexaString := fmt.Sprintf("%x", ID)
-	if len(hexaString) < 24 {
-		hexaString = fmt.Sprintf("%024s", hexaString)
-	}
-	return primitive.ObjectIDFromHex(hexaString)
-}
-
 type TaskError struct {
 	message string
 }
@@ -50,9 +42,9 @@ func GetTasks() ([]models.Task, error) {
 	return result, nil
 }
 
-func GetTaskByID(taskID int64) (models.Task, error) {
+func GetTaskByID(taskID string) (models.Task, error) {
 	var result models.Task
-	ID, err := int64ToObjID(taskID)
+	ID, err := primitive.ObjectIDFromHex(taskID)
 	if err != nil {
 		return models.Task{}, fmt.Errorf(MalformedID)
 	}
@@ -65,16 +57,16 @@ func GetTaskByID(taskID int64) (models.Task, error) {
 	return result, nil
 }
 
-func UpdateTask(taskID int64, updatedTask models.Task) (models.Task, error) {
+func UpdateTask(taskID string, updatedTask models.Task) (models.Task, error) {
 	var result models.Task
-	ID, err := int64ToObjID(taskID)
+	ID, err := primitive.ObjectIDFromHex(taskID)
 	if err != nil {
 		return models.Task{}, fmt.Errorf(MalformedID)
 	}
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	filter := bson.D{{"_id", ID}}
 
-	err = Collection.FindOneAndUpdate(context.TODO(), filter, updatedTask, opts).Decode(&result)
+	err = Collection.FindOneAndUpdate(context.TODO(), filter, bson.M{"$set": updatedTask}, opts).Decode(&result)
 	if err != nil && errors.Is(err, mongo.ErrNoDocuments) {
 		return models.Task{}, fmt.Errorf(IDNotFound)
 	} else if err != nil {
@@ -83,9 +75,9 @@ func UpdateTask(taskID int64, updatedTask models.Task) (models.Task, error) {
 	return result, nil
 }
 
-func DeleteTask(taskID int64) (models.Task, error) {
+func DeleteTask(taskID string) (models.Task, error) {
 	var result models.Task
-	ID, err := int64ToObjID(taskID)
+	ID, err := primitive.ObjectIDFromHex(taskID)
 	if err != nil {
 		return models.Task{}, fmt.Errorf(MalformedID)
 	}
